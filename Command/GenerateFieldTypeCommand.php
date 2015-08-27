@@ -2,6 +2,8 @@
 namespace BD\EzFieldTypeGeneratorBundle\Command;
 
 use BD\EzFieldTypeGeneratorBundle\Generator\FieldTypeGenerator;
+use eZ\Publish\Core\Base\Exceptions\NotFound\FieldTypeNotFoundException;
+use InvalidArgumentException;
 use Sensio\Bundle\GeneratorBundle\Command\GeneratorCommand;
 use Sensio\Bundle\GeneratorBundle\Command\Validators;
 use Symfony\Component\Console\Input\InputOption;
@@ -134,9 +136,9 @@ EOT
                     $dir = $this->getContainer()->get('kernel')->locateResource("@$targetBundle");
                 } catch (\InvalidArgumentException $e) {
                     $output->writeln($questionHelper->getHelperSet()->get('formatter')->formatBlock($e->getMessage(), 'error'));
+                    $acceptedTargetBundle = false;
                     continue;
                 }
-                $acceptedTargetBundle = $questionHelper->ask($input, $output, new ConfirmationQuestion("Generating to $targetBundle ($dir). Do you confirm ?"));
 
                 // mark as accepted, unless they want to try again below
                 $acceptedTargetBundle = true;
@@ -163,6 +165,19 @@ EOT
             $question = new Question($questionHelper->getQuestion('FieldType name', $fieldTypeName), $fieldTypeName);
             // @todo validate me // $question->setValidator();
             $fieldTypeName = $questionHelper->ask($input, $output, $question);
+            $fieldTypeRegistry = $this->getContainer()->get('ezpublish.persistence.field_type_registry');
+
+            $fieldTypeExists = true;
+            try {
+                $fieldTypeRegistry->getFieldType($fieldTypeName);
+            } catch (FieldTypeNotFoundException $e) {
+                $fieldTypeExists = false;
+                return 1;
+            }
+
+            if ($fieldTypeExists === true) {
+                throw new InvalidArgumentException("A fieldtype $fieldTypeName already exists");
+            }
             $input->setOption('fieldtype-name', $fieldTypeName);
         }
 
