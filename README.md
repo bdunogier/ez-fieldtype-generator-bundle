@@ -52,7 +52,6 @@ Your FieldType must be created in a bundle.
 
 If you don't have a bundle for it, please create one using generate:bundle first
 Target bundle name: BDTestBundle
-target bundle dir: /home/bertrand/ezpublish5/src/BD/Bundle/TestBundle/
 
 A FieldType requires a unique identifier.
 Identifiers can contain alphanumeric characters as well as underscores

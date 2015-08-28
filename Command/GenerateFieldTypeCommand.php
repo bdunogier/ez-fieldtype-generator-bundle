@@ -126,7 +126,6 @@ EOT
         }
 
         $input->setOption('target-bundle-dir', $this->getContainer()->get('kernel')->locateResource("@".$input->getOption('target-bundle')));
-        echo "target bundle dir: " . $input->getOption("target-bundle-dir") . "\n";
 
         // FieldType name
         $fieldTypeName = null;
