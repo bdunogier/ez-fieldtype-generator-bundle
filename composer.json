@@ -1,0 +1,14 @@
+{
+    "name": "bdunogier/ez-fieldtype-generator-bundle",
+    "require": {
+        "sensio/generator-bundle": "^2.5"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bertrand Dunogier",
+            "email": "bd@ez.no"
+        }
+    ],
+    "minimum-stability": "stable"
+}
