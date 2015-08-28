@@ -1,0 +1,63 @@
+<?php
+
+namespace {{ namespace }};
+
+use eZ\Publish\Core\FieldType\FieldType;
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
+use eZ\Publish\SPI\FieldType\Value as SPIValue;
+
+class Type extends FieldType
+{
+    public function validateValidatorConfiguration($validatorConfiguration)
+    {
+    }
+
+    public function validate(FieldDefinition $fieldDefinition, SPIValue $fieldValue)
+    {
+    }
+
+    public function getFieldTypeIdentifier()
+    {
+        return '{{ fieldtype_name }}';
+    }
+
+    public function getName(SPIValue $value)
+    {
+        return (string)$value;
+    }
+
+    public function getEmptyValue()
+    {
+        return new Value();
+    }
+
+    public function isEmptyValue(SPIValue $value)
+    {
+        // Implement me
+    }
+
+    protected function createValueFromInput($inputValue)
+    {
+    }
+
+    protected function checkValueStructure(BaseValue $value)
+    {
+    }
+
+    protected function getSortInfo(BaseValue $value)
+    {
+    }
+
+    public function fromHash($hash)
+    {
+    }
+
+    public function toHash(SPIValue $value)
+    {
+    }
+
+    public function isSearchable()
+    {
+        return true;
+    }
+}

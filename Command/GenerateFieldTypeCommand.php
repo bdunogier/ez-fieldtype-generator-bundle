@@ -27,7 +27,8 @@ class GenerateFieldTypeCommand extends GeneratorCommand
         $this
             ->setDefinition(array(
                 new InputOption('target-bundle', '', InputOption::VALUE_REQUIRED, 'The name of the existing bundle the FieldType must be generated into. Ex: AcmeTestBundle'),
-                new InputOption('fieldtype-name', '', InputOption::VALUE_REQUIRED, 'The name of the FieldTpe to generate. Ex: ezstring'),
+                new InputOption('target-bundle-dir', '', InputOption::VALUE_REQUIRED, 'The directory of the target bundle'),
+                new InputOption('fieldtype-name', '', InputOption::VALUE_REQUIRED, 'The name of the FieldTpe to generate. Ex: Text Line'),
             ))
             ->setDescription('Generates an eZ FieldType')
             ->setHelp(<<<EOT
@@ -56,49 +57,35 @@ EOT
             }
         }
 
-        foreach (array('namespace', 'dir') as $option) {
+        foreach (array('target-bundle', 'fieldtype-name') as $option) {
             if (null === $input->getOption($option)) {
                 throw new \RuntimeException(sprintf('The "%s" option must be provided.', $option));
             }
         }
 
-        // validate the namespace, but don't require a vendor namespace
-        $namespace = Validators::validateBundleNamespace($input->getOption('namespace'), false);
-        if (!$bundle = $input->getOption('bundle-name')) {
-            $bundle = strtr($namespace, array('\\' => ''));
-        }
-        $bundle = Validators::validateBundleName($bundle);
-        $dir = Validators::validateTargetDir($input->getOption('dir'), $bundle, $namespace);
-        if (null === $input->getOption('format')) {
-            $input->setOption('format', 'annotation');
-        }
-        $format = Validators::validateFormat($input->getOption('format'));
-        $structure = $input->getOption('structure');
-
-        $questionHelper->writeSection($output, 'Bundle generation');
-
-        if (!$this->getContainer()->get('filesystem')->isAbsolutePath($dir)) {
-            $dir = getcwd().'/'.$dir;
-        }
-
         $generator = $this->getGenerator();
-        $generator->generate($namespace, $bundle, $dir, $format, $structure);
+        $generator->generate(
+            $input->getOption('target-bundle'),
+            $input->getOption('target-bundle-dir'),
+            $input->getOption('fieldtype-name'),
+            $input->getOption('fieldtype-name')
+        );
 
-        $output->writeln('Generating the bundle code: <info>OK</info>');
+        $output->writeln('Generating the FieldType code: <info>OK</info>');
 
-        $errors = array();
-        $runner = $questionHelper->getRunner($output, $errors);
-
-        // check that the namespace is already autoloaded
-        $runner($this->checkAutoloader($output, $namespace, $bundle, $dir));
-
-        // register the bundle in the Kernel class
-        $runner($this->updateKernel($questionHelper, $input, $output, $this->getContainer()->get('kernel'), $namespace, $bundle));
-
-        // routing
-        $runner($this->updateRouting($questionHelper, $input, $output, $bundle, $format));
-
-        $questionHelper->writeGeneratorSummary($output, $errors);
+//        $errors = array();
+//        $runner = $questionHelper->getRunner($output, $errors);
+//
+//        // check that the namespace is already autoloaded
+//        $runner($this->checkAutoloader($output, $namespace, $bundle, $dir));
+//
+//        // register the bundle in the Kernel class
+//        $runner($this->updateKernel($questionHelper, $input, $output, $this->getContainer()->get('kernel'), $namespace, $bundle));
+//
+//        // routing
+//        $runner($this->updateRouting($questionHelper, $input, $output, $bundle, $format));
+//
+//        $questionHelper->writeGeneratorSummary($output, $errors);
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
@@ -132,19 +119,14 @@ EOT
                 });
                 $targetBundle = $questionHelper->ask($input, $output, $question);
 
-                try {
-                    $dir = $this->getContainer()->get('kernel')->locateResource("@$targetBundle");
-                } catch (\InvalidArgumentException $e) {
-                    $output->writeln($questionHelper->getHelperSet()->get('formatter')->formatBlock($e->getMessage(), 'error'));
-                    $acceptedTargetBundle = false;
-                    continue;
-                }
-
                 // mark as accepted, unless they want to try again below
                 $acceptedTargetBundle = true;
             }
             $input->setOption('target-bundle', $targetBundle);
         }
+
+        $input->setOption('target-bundle-dir', $this->getContainer()->get('kernel')->locateResource("@".$input->getOption('target-bundle')));
+        echo "target bundle dir: " . $input->getOption("target-bundle-dir") . "\n";
 
         // FieldType name
         $fieldTypeName = null;
@@ -170,9 +152,8 @@ EOT
             $fieldTypeExists = true;
             try {
                 $fieldTypeRegistry->getFieldType($fieldTypeName);
-            } catch (FieldTypeNotFoundException $e) {
+            } catch (\Exception $e) {
                 $fieldTypeExists = false;
-                return 1;
             }
 
             if ($fieldTypeExists === true) {

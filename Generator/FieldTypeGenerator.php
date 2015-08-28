@@ -22,57 +22,34 @@ class FieldTypeGenerator extends Generator
         $this->kernel = $kernel;
     }
 
-    public function generate($targetBundle, $fieldTypeName)
+    public function generate($targetBundle, $targetBundleDir, $fieldTypeName, $fieldTypeIdentifier)
     {
-        $dir = $this->kernel->locateResource("@$targetBundle");
-        if (file_exists($dir)) {
-            if (!is_dir($dir)) {
-                throw new \RuntimeException(sprintf('Unable to generate the bundle as the target directory "%s" exists but is a file.', realpath($dir)));
+        $this->setSkeletonDirs(realpath(__DIR__.'/../Resources/skeleton'));
+        if (file_exists($targetBundleDir)) {
+            if (!is_dir($targetBundleDir)) {
+                throw new \RuntimeException(sprintf('Unable to generate the bundle as the target directory "%s" exists but is a file.', realpath($targetBundleDir)));
             }
-            $files = scandir($dir);
-            if ($files != array('.', '..')) {
-                throw new \RuntimeException(sprintf('Unable to generate the bundle as the target directory "%s" is not empty.', realpath($dir)));
-            }
-            if (!is_writable($dir)) {
-                throw new \RuntimeException(sprintf('Unable to generate the bundle as the target directory "%s" is not writable.', realpath($dir)));
+            if (!is_writable($targetBundleDir)) {
+                throw new \RuntimeException(sprintf('Unable to generate the bundle as the target directory "%s" is not writable.', realpath($targetBundleDir)));
             }
         }
 
-        $basename = substr($bundle, 0, -6);
         $parameters = array(
-            'namespace' => $namespace,
-            'bundle'    => $bundle,
-            'format'    => $format,
-            'bundle_basename' => $basename,
-            'extension_alias' => Container::underscore($basename),
+            'namespace' => 'BD\Test',
+            'target_bundle' => $targetBundle,
+            'target_bundle_dir' => $targetBundleDir,
+            'fieldtype_name' => $fieldTypeName,
+            'fieldtype_identifier' => $fieldTypeIdentifier,
         );
 
-        $this->renderFile('bundle/Bundle.php.twig', $dir.'/'.$bundle.'.php', $parameters);
-        $this->renderFile('bundle/Extension.php.twig', $dir.'/DependencyInjection/'.$basename.'Extension.php', $parameters);
-        $this->renderFile('bundle/Configuration.php.twig', $dir.'/DependencyInjection/Configuration.php', $parameters);
-        $this->renderFile('bundle/DefaultController.php.twig', $dir.'/Controller/DefaultController.php', $parameters);
-        $this->renderFile('bundle/DefaultControllerTest.php.twig', $dir.'/Tests/Controller/DefaultControllerTest.php', $parameters);
-        $this->renderFile('bundle/index.html.twig.twig', $dir.'/Resources/views/Default/index.html.twig', $parameters);
+        $this->renderFile('Type.php.twig', $targetBundleDir.'/eZ/FieldType/FieldTypeName/Type.php', $parameters);
+        $this->renderFile('Value.php.twig', $targetBundleDir.'/eZ/FieldType/FieldTypeName/Value.php', $parameters);
 
-        if ('xml' === $format || 'annotation' === $format) {
-            $this->renderFile('bundle/services.xml.twig', $dir.'/Resources/config/services.xml', $parameters);
-        } else {
-            $this->renderFile('bundle/services.'.$format.'.twig', $dir.'/Resources/config/services.'.$format, $parameters);
-        }
+        // service definition
+        $this->renderFile('fieldtypes.yml.twig', $targetBundleDir.'/Resources/config/fieldtypes.yml', $parameters);
 
-        if ('annotation' != $format) {
-            $this->renderFile('bundle/routing.'.$format.'.twig', $dir.'/Resources/config/routing.'.$format, $parameters);
-        }
-
-        if ($structure) {
-            $this->renderFile('bundle/messages.fr.xlf', $dir.'/Resources/translations/messages.fr.xlf', $parameters);
-
-            $this->filesystem->mkdir($dir.'/Resources/doc');
-            $this->filesystem->touch($dir.'/Resources/doc/index.rst');
-            $this->filesystem->mkdir($dir.'/Resources/translations');
-            $this->filesystem->mkdir($dir.'/Resources/public/css');
-            $this->filesystem->mkdir($dir.'/Resources/public/images');
-            $this->filesystem->mkdir($dir.'/Resources/public/js');
-        }
+        // external storage if any
+        // form mapper
+        // form template
     }
 }
