@@ -41,5 +41,29 @@ When asked for the name of the bundle, use an existing bundle. If you don't have
 
 The script will then ask for the fieldtype's name, that is really the fieldtype's identifier.
 
-Confirm generation, and the files will be written to the bundle.
+Confirm generation, and the files will be written to the bundle:
 
+```
+$ php ezpublish/console generate:ez:fieldtype
+
+  Welcome to the eZ FieldType generator
+
+Your FieldType must be created in a bundle.
+
+If you don't have a bundle for it, please create one using generate:bundle first
+Target bundle name: BDTestBundle
+target bundle dir: /home/bertrand/ezpublish5/src/BD/Bundle/TestBundle/
+
+A FieldType requires a unique identifier.
+Identifiers can contain alphanumeric characters as well as underscores
+
+FieldType name: bdtest
+
+  Summary before generation
+
+
+You are going to generate a "bdtest" FieldType in the "BDTestBundle" bundle.
+
+Do you confirm generation [yes]?
+Generating the FieldType code: OK
+```
