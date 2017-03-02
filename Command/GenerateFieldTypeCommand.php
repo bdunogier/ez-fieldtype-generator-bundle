@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * Generates bundles.
@@ -63,12 +64,15 @@ EOT
             }
         }
 
+        $converter = new CamelCaseToSnakeCaseNameConverter();
+        $fieldTypeIdentifier = $converter->normalize(lcfirst($input->getOption('fieldtype-name')));
+
         $generator = $this->getGenerator();
         $generator->generate(
             $input->getOption('target-bundle'),
             $input->getOption('target-bundle-dir'),
             $input->getOption('fieldtype-name'),
-            $input->getOption('fieldtype-name')
+            $fieldTypeIdentifier
         );
 
         $output->writeln('Generating the FieldType code: <info>OK</info>');

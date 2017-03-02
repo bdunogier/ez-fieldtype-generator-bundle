@@ -1,0 +1,14 @@
+services:
+    ezplatform.fieldtype.{{ fieldtype_identifier }}:
+        class: '{{ fieldtype_type_class }}'
+        parent: ezpublish.fieldType
+        arguments:
+            - "@ezpublish.api.service.field_type"
+        tags:
+            - {name: ezpublish.fieldType, alias: {{ fieldtype_identifier }}}
+            - {name: ez.fieldFormMapper.definition, fieldType: {{ fieldtype_identifier }}}
+
+    ezplatform.fieldtype.{{ fieldtype_identifier }}.converter:
+        class: {{ fieldtype_converter_class }}
+        tags:
+            - {name: ezpublish.storageEngine.legacy.converter, alias: {{ fieldtype_identifier }}}

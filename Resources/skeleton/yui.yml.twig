@@ -1,0 +1,22 @@
+system:
+    default:
+        yui:
+            modules:
+                ez-contenteditformview:
+                    requires:
+                        - '{{ fieldtype_identifier }}-editview'
+                ez-rawcontentview:
+                    requires:
+                        - '{{ fieldtype_identifier }}-view'
+                {{ fieldtype_identifier }}editview-ez-template:
+                    type: 'template'
+                    path: {{ public_bundle_dir }}/templates/fields/edit/{{ fieldtype_identifier }}.hbt
+                {{ fieldtype_identifier }}-editview:
+                    requires: ['ez-fieldeditview', 'event-valuechange', '{{ fieldtype_identifier }}editview-ez-template']
+                    path: {{ public_bundle_dir }}/js/views/fields/ez-{{ fieldtype_identifier }}-editview.js
+                {{ fieldtype_identifier }}view-ez-template:
+                    type: 'template'
+                    path: {{ public_bundle_dir }}/templates/fields/view/{{ fieldtype_identifier }}.hbt
+                {{ fieldtype_identifier }}-view:
+                    requires: ['ez-fieldview', '{{ fieldtype_identifier }}view-ez-template', 'ez-asynchronousview']
+                    path: {{ public_bundle_dir }}/js/views/fields/ez-{{ fieldtype_identifier }}-view.js
