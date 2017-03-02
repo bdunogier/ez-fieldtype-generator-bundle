@@ -1,7 +1,0 @@
-services:
-    ezpublish.fieldType.{{ fieldtype_identifier }}:
-        class: %ezpublish.fieldType.fieldtype_identifier.class%
-            parent: ezpublish.fieldType
-            arguments: [ @ezpublish.api.service.tags ]
-            tags:
-                - {name: ezpublish.fieldType, alias: {{ fieldtype_identifier }} }

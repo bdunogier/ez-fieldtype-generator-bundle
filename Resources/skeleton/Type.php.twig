@@ -1,24 +1,44 @@
 <?php
 
-namespace {{ namespace }};
+namespace {{ namespace }}\eZ\FieldType\{{ fieldtype_name }};
 
-use eZ\Publish\Core\FieldType\FieldType;
+use eZ\Publish\API\Repository\FieldTypeService;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
+use eZ\Publish\Core\FieldType\FieldType;
+use eZ\Publish\Core\FieldType\Value as BaseValue;
 use eZ\Publish\SPI\FieldType\Value as SPIValue;
+use EzSystems\RepositoryForms\Data\Content\FieldData;
+use EzSystems\RepositoryForms\Data\FieldDefinitionData;
+use EzSystems\RepositoryForms\FieldType\FieldDefinitionFormMapperInterface;
+use EzSystems\RepositoryForms\FieldType\FieldValueFormMapperInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class Type extends FieldType
+class Type extends FieldType implements FieldDefinitionFormMapperInterface, FieldValueFormMapperInterface
 {
+    /**
+     * @var \eZ\Publish\API\Repository\FieldTypeService
+     */
+    private $fieldTypeService;
+
+    public function __construct(FieldTypeService $fieldTypeService)
+    {
+        $this->fieldTypeService = $fieldTypeService;
+    }
+
     public function validateValidatorConfiguration($validatorConfiguration)
     {
+        return [];
     }
 
     public function validate(FieldDefinition $fieldDefinition, SPIValue $fieldValue)
     {
+        return [];
     }
 
     public function getFieldTypeIdentifier()
     {
-        return '{{ fieldtype_name }}';
+        return '{{ fieldtype_identifier }}';
     }
 
     public function getName(SPIValue $value)
@@ -38,6 +58,7 @@ class Type extends FieldType
 
     protected function createValueFromInput($inputValue)
     {
+        return $inputValue;
     }
 
     protected function checkValueStructure(BaseValue $value)
@@ -46,18 +67,37 @@ class Type extends FieldType
 
     protected function getSortInfo(BaseValue $value)
     {
+        return (string)$value;
     }
 
     public function fromHash($hash)
     {
+        return new Value();
     }
 
     public function toHash(SPIValue $value)
     {
+        return [];
     }
 
     public function isSearchable()
     {
         return true;
+    }
+
+    public function mapFieldDefinitionForm(FormInterface $fieldDefinitionForm, FieldDefinitionData $data)
+    {
+    }
+
+    public function mapFieldValueForm(FormInterface $fieldForm, FieldData $data)
+    {
+    }
+
+    /**
+     * Fake method to set the translation domain for the extractor.
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(['translation_domain' => 'ezrepoforms_content_type']);
     }
 }

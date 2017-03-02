@@ -1,0 +1,31 @@
+<?php
+
+namespace {{ namespace }}\DependencyInjection;
+
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Yaml\Yaml;
+
+class {{ class_name }} extends Extension implements PrependExtensionInterface
+{
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.yml');
+    }
+
+    public function prepend( ContainerBuilder $container )
+    {
+        $config = Yaml::parse( __DIR__ . '/../Resources/config/fieldtypes_templates.yml' );
+        $container->prependExtensionConfig( 'ezpublish', $config );
+
+        $yuiConfigFile = __DIR__ . '/../Resources/config/yui.yml';
+        $config = Yaml::parse(file_get_contents($yuiConfigFile));
+        $container->prependExtensionConfig('ez_platformui', $config);
+        $container->addResource(new FileResource($yuiConfigFile));
+    }
+}
