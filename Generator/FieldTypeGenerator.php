@@ -135,5 +135,12 @@ class FieldTypeGenerator extends Generator
             sprintf('%s/Resources/config/yui.yml', $targetBundleDir),
             $parameters
         );
+
+        // README
+        $this->renderFile(
+            'README.md.twig',
+            sprintf('%s/README.md', $targetBundleDir),
+            $parameters
+        );
     }
 }
