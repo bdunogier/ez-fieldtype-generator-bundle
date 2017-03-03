@@ -10,5 +10,8 @@
             "email": "bd@ez.no"
         }
     ],
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "require": {
+        "matthiasnoback/symfony-console-form": "^2.3"
+    }
 }
