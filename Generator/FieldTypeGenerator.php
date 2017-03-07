@@ -21,23 +21,16 @@ class FieldTypeGenerator extends Generator
         $this->kernel = $kernel;
     }
 
-    public function generate($targetBundle, $targetBundleDir, $fieldTypeName, $fieldTypeIdentifier)
+    public function generate($targetBundle, $fieldTypeName, $fieldTypeIdentifier)
     {
         $this->setSkeletonDirs(realpath(__DIR__.'/../Resources/skeleton'));
-        if (file_exists($targetBundleDir)) {
-            if (!is_dir($targetBundleDir)) {
-                throw new \RuntimeException(sprintf('Unable to generate the bundle as the target directory "%s" exists but is a file.', realpath($targetBundleDir)));
-            }
-            if (!is_writable($targetBundleDir)) {
-                throw new \RuntimeException(sprintf('Unable to generate the bundle as the target directory "%s" is not writable.', realpath($targetBundleDir)));
-            }
-        }
 
         $bundle = $this->kernel->getBundle($targetBundle);
+
         $parameters = [
             'namespace' => $bundle->getNamespace(),
             'target_bundle' => $targetBundle,
-            'target_bundle_dir' => $targetBundleDir,
+            'target_bundle_dir' => $bundle->getPath(),
             'fieldtype_name' => $fieldTypeName,
             'fieldtype_identifier' => $fieldTypeIdentifier,
             'fieldtype_type_class' => sprintf('%s\eZ\FieldType\%s\Type', $bundle->getNamespace(), $fieldTypeName),
@@ -46,46 +39,46 @@ class FieldTypeGenerator extends Generator
         ];
 
         $this->renderFile(
-            'Type.php.twig',
-            sprintf('%s/eZ/FieldType/%s/Type.php', $targetBundleDir, $fieldTypeName),
+            'eZ/FieldType/Name/Type.php.twig',
+            sprintf('%s/eZ/FieldType/%s/Type.php', $parameters['target_bundle_dir'], $fieldTypeName),
             $parameters
         );
         $this->renderFile(
-            'Value.php.twig',
-            sprintf('%s/eZ/FieldType/%s/Value.php', $targetBundleDir, $fieldTypeName),
+            'eZ/FieldType/Name/Value.php.twig',
+            sprintf('%s/eZ/FieldType/%s/Value.php', $parameters['target_bundle_dir'], $fieldTypeName),
             $parameters
         );
         $this->renderFile(
-            'LegacyConverter.php.twig',
-            sprintf('%s/eZ/FieldType/%s/LegacyConverter.php', $targetBundleDir, $fieldTypeName),
+            'eZ/FieldType/Name/LegacyConverter.php.twig',
+            sprintf('%s/eZ/FieldType/%s/LegacyConverter.php', $parameters['target_bundle_dir'], $fieldTypeName),
             $parameters
         );
 
         // service definition
         $this->renderFile(
-            'services.yml.twig',
-            sprintf('%s/Resources/config/services.yml', $targetBundleDir),
+            'Resources/config/services.yml.twig',
+            sprintf('%s/Resources/config/services.yml', $parameters['target_bundle_dir']),
             $parameters
         );
 
         // fieldtypes templates configuration
         $this->renderFile(
-            'fieldtypes_templates.yml.twig',
-            sprintf('%s/Resources/config/fieldtypes_templates.yml', $targetBundleDir),
+            'Resources/config/fieldtypes_templates.yml.twig',
+            sprintf('%s/Resources/config/fieldtypes_templates.yml', $parameters['target_bundle_dir']),
             $parameters
         );
         // fieldtypes templates
         $this->renderFile(
-            'fieldtypes_templates.html.twig',
-            sprintf('%s/Resources/views/fieldtypes_templates.html.twig', $targetBundleDir),
+            'Resources/views/fieldtypes_templates.html.twig',
+            sprintf('%s/Resources/views/fieldtypes_templates.html.twig', $parameters['target_bundle_dir']),
             $parameters
         );
         // DI Extension that prepends the fieldtypes_templates configuration
         $this->renderFile(
-            'Extension.php.twig',
+            'DependencyInjection/Extension.php.twig',
             sprintf(
                 '%s/DependencyInjection/%s.php',
-                $targetBundleDir,
+                $parameters['target_bundle_dir'],
                 str_replace('Bundle', 'Extension', $targetBundle)
             ),
             $parameters + [
@@ -95,51 +88,51 @@ class FieldTypeGenerator extends Generator
 
         // yui items
         $this->renderFile(
-            'fieldedit.hbt.twig',
+            'Resources/public/templates/fields/edit/fieldedit.hbt.twig',
             sprintf(
                 '%s/Resources/public/templates/fields/edit/%s.hbt',
-                $targetBundleDir,
+                $parameters['target_bundle_dir'],
                 $fieldTypeIdentifier
             ),
             $parameters
         );
         $this->renderFile(
-            'fieldeditview.js.twig',
+            'Resources/public/js/views/fields/fieldeditview.js.twig',
             sprintf(
                 '%s/Resources/public/js/views/fields/ez-%s-editview.js',
-                $targetBundleDir,
+                $parameters['target_bundle_dir'],
                 $fieldTypeIdentifier
             ),
             $parameters
         );
         $this->renderFile(
-            'fieldview.hbt.twig',
+            'Resources/public/templates/fields/view/fieldview.hbt.twig',
             sprintf(
                 '%s/Resources/public/templates/fields/view/%s.hbt',
-                $targetBundleDir,
+                $parameters['target_bundle_dir'],
                 $fieldTypeIdentifier
             ),
             $parameters
         );
         $this->renderFile(
-            'fieldview.js.twig',
+            'Resources/public/js/views/fields/fieldview.js.twig',
             sprintf(
                 '%s/Resources/public/js/views/fields/ez-%s-view.js',
-                $targetBundleDir,
+                $parameters['target_bundle_dir'],
                 $fieldTypeIdentifier
             ),
             $parameters
         );
         $this->renderFile(
-            'yui.yml.twig',
-            sprintf('%s/Resources/config/yui.yml', $targetBundleDir),
+            'Resources/config/yui.yml.twig',
+            sprintf('%s/Resources/config/yui.yml', $parameters['target_bundle_dir']),
             $parameters
         );
 
         // README
         $this->renderFile(
             'README.md.twig',
-            sprintf('%s/README.md', $targetBundleDir),
+            sprintf('%s/README.md', $parameters['target_bundle_dir']),
             $parameters
         );
     }
