@@ -44,7 +44,7 @@ The script will then ask for the fieldtype's name, that is really the fieldtype'
 Confirm generation, and the files will be written to the bundle:
 
 ```
-$ php ezpublish/console generate:ez:fieldtype
+$ php app/console generate:ez:fieldtype
 
   Welcome to the eZ FieldType generator
 
