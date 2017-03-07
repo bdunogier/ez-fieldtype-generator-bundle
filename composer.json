@@ -1,8 +1,5 @@
 {
     "name": "bdunogier/ez-fieldtype-generator-bundle",
-    "require": {
-        "sensio/generator-bundle": "^2.5"
-    },
     "license": "MIT",
     "authors": [
         {
@@ -10,5 +7,8 @@
             "email": "bd@ez.no"
         }
     ],
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "require": {
+        "sensio/generator-bundle": "^2.5|^3.0"
+    }
 }
