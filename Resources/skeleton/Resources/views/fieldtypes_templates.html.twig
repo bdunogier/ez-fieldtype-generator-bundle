@@ -1,0 +1,23 @@
+{{ '{% block' }} {{ fieldtype_identifier }}_field_definition_edit {{ '%}' }}
+    {{ '{# Use the block below for each "setting" your fieldtype has' }}
+    <div class="{{ fieldtype_identifier }}-settings setting{% verbatim %}{% if group_class is not empty %} {{ group_class }}{% endif %}"{% endverbatim %}>
+        {% verbatim %}{{- form_label(form.setting) -}}
+        {{- form_errors(form.setting) -}}
+        {{- form_widget(form.setting) -}}{% endverbatim %}
+    </div>
+    {{ '#}' }}
+{{ '{% endblock %}'}}
+
+{{ '{% block' }} {{ fieldtype_identifier }}_field {{ '%}' }}
+    {% verbatim %}{% spaceless %}
+        {% set field_value %}
+            {{ field.value|raw }}
+        {% endset %}
+        {{ block( 'simple_block_field' ) }}
+    {% endspaceless %}{% endverbatim %}
+{{ '{% endblock %}'}}
+
+{{ '{% block' }} {{ fieldtype_identifier }}_settings {{ '%}' }}
+    <ul class="ez-fielddefinition-settings ez-fielddefinition-{{ '{{ fielddefinition.fieldTypeIdentifier }}' }}-settings">
+    </ul>
+{{ '{% endblock %}'}}
